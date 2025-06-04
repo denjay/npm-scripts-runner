@@ -1,0 +1,61 @@
+{
+  "name": "run-npm-scripts",
+  "displayName": "run npm scripts",
+  "publisher": "denjay",
+  "description": "Run npm scripts directly from the status bar",
+  "icon": "assets/npm-icon.png",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.86.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "npm",
+    "scripts",
+    "package.json",
+    "node",
+    "runner",
+    "status bar",
+    "quick pick"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/denjay/run-npm-scripts.git"
+  },
+  "activationEvents": [
+    "workspaceContains:package.json"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "run-npm-scripts.showScripts",
+        "title": "Show NPM Scripts"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.86.0",
+    "@types/glob": "^8.0.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "16.x",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "eslint": "^8.28.0",
+    "glob": "^8.0.3",
+    "mocha": "^10.1.0",
+    "typescript": "^4.9.3",
+    "@vscode/test-electron": "^2.2.0"
+  }
+}
