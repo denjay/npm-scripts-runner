@@ -203,6 +203,54 @@ function getOrCreateTerminal(
 }
 
 /**
+ * 运行最后执行的npm脚本
+ */
+async function runLastScript() {
+  // 获取所有工作区
+  const workspaceFolders = vscode.workspace.workspaceFolders;
+  if (!workspaceFolders) {
+    vscode.window.showErrorMessage("Please open a workspace first");
+    return;
+  }
+
+  // 如果有多个工作区，让用户选择
+  let selectedWorkspace = workspaceFolders[0];
+  if (workspaceFolders.length > 1) {
+    const selected = await vscode.window.showQuickPick(
+      workspaceFolders.map((folder) => ({
+        label: folder.name,
+        description: folder.uri.fsPath,
+        folder: folder,
+      })),
+      {
+        placeHolder: "Select a workspace to run last npm script",
+      }
+    );
+    if (!selected) {
+      return;
+    }
+    selectedWorkspace = selected.folder;
+  }
+
+  // 获取最后执行的脚本
+  const lastExecutedScript = getLastExecutedScript(selectedWorkspace);
+
+  if (!lastExecutedScript) {
+    vscode.window.showInformationMessage(
+      "No previously executed npm script found"
+    );
+    return;
+  }
+
+  // 获取或创建工作区专用终端
+  const terminal = getOrCreateTerminal(selectedWorkspace);
+  terminal.show();
+
+  // 执行npm命令
+  terminal.sendText(`npm run ${lastExecutedScript}`);
+}
+
+/**
  * 显示npm脚本列表并执行选中的脚本
  */
 async function showScriptsList() {
@@ -294,9 +342,14 @@ export function activate(context: vscode.ExtensionContext) {
   updateStatusBarVisibility();
 
   // 注册命令
-  let disposable = vscode.commands.registerCommand(
+  let showScriptsDisposable = vscode.commands.registerCommand(
     "run-npm-scripts.showScripts",
     showScriptsList
+  );
+
+  let runLastScriptDisposable = vscode.commands.registerCommand(
+    "run-npm-scripts.runLastScript",
+    runLastScript
   );
 
   // 监听终端关闭事件
@@ -328,7 +381,7 @@ export function activate(context: vscode.ExtensionContext) {
     })
   );
 
-  // 定期清理脚本历史记录（每小时）
+  // 定期清理脚本历史记录（每)时）
   const cleanupInterval = setInterval(() => {
     cleanupScriptHistory();
   }, 60 * 60 * 1000);
@@ -338,7 +391,11 @@ export function activate(context: vscode.ExtensionContext) {
     dispose: () => clearInterval(cleanupInterval),
   });
 
-  context.subscriptions.push(disposable, statusBarItem);
+  context.subscriptions.push(
+    showScriptsDisposable,
+    runLastScriptDisposable,
+    statusBarItem
+  );
 }
 
 export function deactivate() {

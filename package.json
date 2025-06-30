@@ -4,7 +4,7 @@
   "publisher": "denjay",
   "description": "Run npm scripts directly from the status bar",
   "icon": "assets/npm-icon.png",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.86.0"
   },
@@ -34,6 +34,17 @@
       {
         "command": "run-npm-scripts.showScripts",
         "title": "Show NPM Scripts"
+      },
+      {
+        "command": "run-npm-scripts.runLastScript",
+        "title": "Run Last NPM Script"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "run-npm-scripts.runLastScript",
+        "key": "ctrl+shift+r",
+        "when": "terminalFocus"
       }
     ]
   },
